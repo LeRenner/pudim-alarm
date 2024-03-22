@@ -1,7 +1,10 @@
 const fs = require('fs');
 
+let pudimBlocked = false;
+let jellyfinBlocked = false;
+
 // read telegram secret json from (from root) /secrets/telegram.json
-const telegramSecrets = JSON.parse(fs.readFileSync('telegram.json', 'utf8'));
+const telegramSecrets = JSON.parse(fs.readFileSync('/secrets/telegram.json', 'utf8'));
 
 // anonymous function to send message
 const sendMessage = (chatId, message) => {
@@ -19,6 +22,28 @@ const sendMessage = (chatId, message) => {
 	});
 }
 
+const alert = (service) => {
+	if (service === 'Pudim' && !pudimBlocked) {
+		pudimBlocked = true;
+		sendMessage(telegramSecrets.chatId, '[Backup relay] Service is down: ' + service);
+
+		// unblock in an hour
+		setTimeout(() => {
+			pudimBlocked = false;
+		}, 3600000);
+	} else if (service === 'Jellyfin' && !jellyfinBlocked) {
+		jellyfinBlocked = true;
+		sendMessage(telegramSecrets.chatId, '[Backup relay] Service is down: ' + service);
+
+		// unblock in an hour
+		setTimeout(() => {
+			jellyfinBlocked = false;
+		}, 3600000);
+	}
+
+	sendMessage(telegramSecrets.chatId, '[Backup relay] Service is down: ' + service);
+}
+
 const checkPudim = () => {
 	console.log('Checking pudim...');
 
@@ -28,14 +53,35 @@ const checkPudim = () => {
 		.then(body => {
 			const lines = body.split('\n');
 			if (!lines[1].startsWith('Yes')) {
-				sendMessage(telegramSecrets.chatId, '[Backup relay] Pudim is Down!');
+				alert("Pudim");
 			}
 		})
 		.catch(error=> {
-			sendMessage(telegramSecrets.chatId, '[Backup relay] Pudim is Down!');
+			alert("Pudim");
 		});
 
 }
 
+const checkJellyfin = () => {
+	console.log('Checking jellyfin...');
+
+	// get request to https://jelly.pudim.xyz/health and check if response is "Healthy"
+	fetch('https://jelly.pudim.xyz/health')
+		.then(response => response.text())
+		.then(body => {
+			if (body !== 'Healthy') {
+				alert("Jellyfin");
+			}
+		})
+		.catch(error=> {
+			alert("Jellyfin");
+		});
+}
+
+const checkAllServices = () => {
+	checkPudim();
+	checkJellyfin();
+}
+
 // run every 10 minutes
-setInterval(checkPudim, 600000);
+setInterval(checkAllServices, 600000);
