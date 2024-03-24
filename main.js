@@ -8,7 +8,7 @@ const telegramSecrets = JSON.parse(fs.readFileSync('/secrets/telegram.json', 'ut
 
 // anonymous function to send message
 const sendMessage = (chatId, message) => {
-	console.log(`Sending message to ${chatId}: ${message}`);
+	console.error(`Sending message to ${chatId}: ${message}`);
 	// send post request to send message on telegram
 	fetch(`https://api.telegram.org/${telegramSecrets.token}/sendMessage`, {
 		method: 'POST',
@@ -30,7 +30,7 @@ const alert = (service) => {
 		// unblock in an hour
 		setTimeout(() => {
 			pudimBlocked = false;
-		}, 3600000);
+		}, 12000);
 	} else if (service === 'Jellyfin' && !jellyfinBlocked) {
 		jellyfinBlocked = true;
 		sendMessage(telegramSecrets.chatId, '[Backup relay] Service is down: ' + service);
@@ -38,14 +38,15 @@ const alert = (service) => {
 		// unblock in an hour
 		setTimeout(() => {
 			jellyfinBlocked = false;
-		}, 3600000);
+		}, 12000);
 	}
 
 	sendMessage(telegramSecrets.chatId, '[Backup relay] Service is down: ' + service);
 }
 
 const checkPudim = () => {
-	console.log('Checking pudim...');
+	// stderr output
+	console.
 
 	// get request to https://pudim.xyz and check if second line starts with "Yes"
 	fetch('https://pudim.xyz')
@@ -63,7 +64,7 @@ const checkPudim = () => {
 }
 
 const checkJellyfin = () => {
-	console.log('Checking jellyfin...');
+	console.error('Checking jellyfin...');
 
 	// get request to https://jelly.pudim.xyz/health and check if response is "Healthy"
 	fetch('https://jelly.pudim.xyz/health')
@@ -84,4 +85,4 @@ const checkAllServices = () => {
 }
 
 // run every 10 minutes
-setInterval(checkAllServices, 600000);
+setInterval(checkAllServices, 6000);
