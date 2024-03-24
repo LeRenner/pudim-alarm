@@ -46,7 +46,7 @@ const alert = (service) => {
 
 const checkPudim = () => {
 	// stderr output
-	console.
+	console.error('Checking pudim...');
 
 	// get request to https://pudim.xyz and check if second line starts with "Yes"
 	fetch('https://pudim.xyz')
