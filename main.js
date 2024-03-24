@@ -1,4 +1,6 @@
 const fs = require('fs');
+// node fetch
+const fetch = require('node-fetch');
 
 let pudimBlocked = false;
 let jellyfinBlocked = false;
@@ -10,7 +12,7 @@ const telegramSecrets = JSON.parse(fs.readFileSync('/secrets/telegram.json', 'ut
 const sendMessage = (chatId, message) => {
 	console.error(`Sending message to ${chatId}: ${message}`);
 	// send post request to send message on telegram
-	fetch(`https://api.telegram.org/${telegramSecrets.token}/sendMessage`, {
+	fetch(`https://api.telegram.org/bot${telegramSecrets.token}/sendMessage`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
