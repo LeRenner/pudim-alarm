@@ -11,8 +11,9 @@ const telegramSecrets = JSON.parse(fs.readFileSync('/secrets/telegram.json', 'ut
 // anonymous function to send message
 const sendMessage = (chatId, message) => {
 	console.error(`Sending message to ${chatId}: ${message}`);
+
 	// send post request to send message on telegram
-	fetch(`https://api.telegram.org/bot${telegramSecrets.token}/sendMessage`, {
+	fetch(`https://api.telegram.org/${telegramSecrets.token}/sendMessage`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
@@ -21,7 +22,15 @@ const sendMessage = (chatId, message) => {
 			chat_id: chatId,
 			text: message
 		})
-	});
+	})
+		.then(data => {
+			console.error('Message sent');
+			console.error(data);
+		})
+		.catch(error => {
+			console.error('Error sending message');
+			console.error(error);
+		});
 }
 
 const alert = (service) => {
