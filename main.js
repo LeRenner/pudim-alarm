@@ -33,26 +33,32 @@ const sendMessage = (chatId, message) => {
 		});
 }
 
-const alert = (service) => {
-	if (service === 'Pudim' && !pudimBlocked) {
+const alert = (service, good) => {
+	if (service === 'Pudim' && !good && !pudimBlocked) {
+		console.error("Sending error message about " + service);
 		pudimBlocked = true;
 		sendMessage(telegramSecrets.chatId, '[Backup relay] Service is down: ' + service);
 
 		// unblock in an hour
 		setTimeout(() => {
 			pudimBlocked = false;
-		}, 12000);
+		}, 1800000);
+	} else if (service === 'Pudim' && good) {
+		console.error("Sending success message about " + service);
+		sendMessage(telegramSecrets.chatId, '[Backup relay] Service is back up: ' + service);
 	} else if (service === 'Jellyfin' && !jellyfinBlocked) {
+		console.error("Sending error message about " + service);
 		jellyfinBlocked = true;
 		sendMessage(telegramSecrets.chatId, '[Backup relay] Service is down: ' + service);
 
 		// unblock in an hour
 		setTimeout(() => {
 			jellyfinBlocked = false;
-		}, 12000);
+		}, 1800000);
+	} else if (service === 'Jellyfin' && good) {
+		console.error("Sending success message about " + service);
+		sendMessage(telegramSecrets.chatId, '[Backup relay] Service is back up: ' + service);
 	}
-
-	sendMessage(telegramSecrets.chatId, '[Backup relay] Service is down: ' + service);
 }
 
 const checkPudim = () => {
@@ -65,11 +71,14 @@ const checkPudim = () => {
 		.then(body => {
 			const lines = body.split('\n');
 			if (!lines[1].startsWith('Yes')) {
-				alert("Pudim");
+				alert("Pudim", false);
+			} else if (lines[1].startsWith('Yes') && pudimBlocked) {
+				alert("Pudim", true)
+				pudimBlocked = false
 			}
 		})
 		.catch(error=> {
-			alert("Pudim");
+			alert("Pudim", false);
 		});
 
 }
@@ -82,11 +91,14 @@ const checkJellyfin = () => {
 		.then(response => response.text())
 		.then(body => {
 			if (body !== 'Healthy') {
-				alert("Jellyfin");
+				alert("Jellyfin", false);
+			} else if (body == "Healthy" && jellyfinBlocked) {
+				alert("Jellyfin", true)
+				jellyfinBlocked = false
 			}
 		})
 		.catch(error=> {
-			alert("Jellyfin");
+			alert("Jellyfin", false);
 		});
 }
 
@@ -96,4 +108,4 @@ const checkAllServices = () => {
 }
 
 // run every 10 minutes
-setInterval(checkAllServices, 6000);
+setInterval(checkAllServices, 30000);
