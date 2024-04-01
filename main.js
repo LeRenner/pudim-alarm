@@ -46,7 +46,7 @@ const alert = (service, good) => {
 	} else if (service === 'Pudim' && good) {
 		console.error("Sending success message about " + service);
 		sendMessage(telegramSecrets.chatId, '[Backup relay] Service is back up: ' + service);
-	} else if (service === 'Jellyfin' && !jellyfinBlocked) {
+	} else if (service === 'Jellyfin' && !good && !jellyfinBlocked) {
 		console.error("Sending error message about " + service);
 		jellyfinBlocked = true;
 		sendMessage(telegramSecrets.chatId, '[Backup relay] Service is down: ' + service);
