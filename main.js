@@ -42,7 +42,7 @@ const alert = (service, good) => {
 		// unblock in an hour
 		setTimeout(() => {
 			pudimBlocked = false;
-		}, 1800000);
+		}, 21600000);
 	} else if (service === 'Pudim' && good) {
 		console.error("Sending success message about " + service);
 		sendMessage(telegramSecrets.chatId, '[Backup relay] Service is back up: ' + service);
@@ -54,7 +54,7 @@ const alert = (service, good) => {
 		// unblock in an hour
 		setTimeout(() => {
 			jellyfinBlocked = false;
-		}, 1800000);
+		}, 21600000);
 	} else if (service === 'Jellyfin' && good) {
 		console.error("Sending success message about " + service);
 		sendMessage(telegramSecrets.chatId, '[Backup relay] Service is back up: ' + service);
@@ -108,4 +108,4 @@ const checkAllServices = () => {
 }
 
 // run every 10 minutes
-setInterval(checkAllServices, 30000);
+setInterval(checkAllServices, 10000);
